@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>99 Apartments | Premium Real Estate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a5f;
+            --accent: #d4af37;
+            --light: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, .serif {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .hero-bg {
+            background: linear-gradient(135deg, rgba(30,58,95,0.9), rgba(30,58,95,0.7)), 
+                        url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .property-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .property-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .property-image {
+            transition: transform 0.6s ease;
+        }
+        
+        .property-card:hover .property-image {
+            transform: scale(1.1);
+        }
+        
+        .nav-blur {
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.95);
+        }
+        
+        .gold-gradient {
+            background: linear-gradient(135deg, #d4af37 0%, #f4e5c2 100%);
+        }
+        
+        .slide-in {
+            animation: slideIn 0.8s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal {
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .contact-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .loader {
+            border-top-color: var(--accent);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .image-gallery {
+            scroll-snap-type: x mandatory;
+        }
+        
+        .gallery-item {
+            scroll-snap-align: start;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 nav-blur shadow-sm transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 gold-gradient rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">99</span>
+                    </div>
+                    <span class="text-2xl font-bold text-gray-900 serif">Apartments</span>
+                </div>
+                
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#home" class="hover:text-yellow-600 transition-colors font-medium">Home</a>
+                    <a href="#properties" class="hover:text-yellow-600 transition-colors font-medium">Properties</a>
+                    <a href="#about" class="hover:text-yellow-600 transition-colors font-medium">About</a>
+                    <a href="#contact" class="hover:text-yellow-600 transition-colors font-medium">Contact</a>
+                    <button onclick="openModal('loginModal')" class="px-6 py-2 bg-blue-900 text-white rounded-full hover:bg-blue-800 transition-all transform hover:scale-105">
+                        Client Portal
+                    </button>
+                </div>
+                
+                <button class="md:hidden text-2xl" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t">
+            <div class="px-6 py-4 space-y-3">
+                <a href="#home" class="block py-2 hover:text-yellow-600">Home</a>
+                <a href="#properties" class="block py-2 hover:text-yellow-600">Properties</a>
+                <a href="#about" class="block py-2 hover:text-yellow-600">About</a>
+                <a href="#contact" class="block py-2 hover:text-yellow-600">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-bg min-h-screen flex items-center justify-center text-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-black opacity-40"></div>
+        <div class="container mx-auto px-6 relative z-10 text-center slide-in">
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                Find Your Perfect<br>
+                <span class="text-yellow-400">Space</span>
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
+                Premium apartments and real estate solutions across Nigeria and Cameroon
+            </p>
+            
+            <!-- Search Bar -->
+            <div class="bg-white rounded-full p-2 max-w-3xl mx-auto shadow-2xl flex flex-col md:flex-row gap-2">
+                <select class="flex-1 px-6 py-3 rounded-full bg-gray-100 text-gray-800 outline-none border-none" id="locationFilter">
+                    <option value="">All Locations</option>
+                    <option value="lagos">Lagos, Nigeria</option>
+                    <option value="abuja">Abuja, Nigeria</option>
+                    <option value="douala">Douala, Cameroon</option>
+                    <option value="yaounde">Yaoundé, Cameroon</option>
+                </select>
+                <select class="flex-1 px-6 py-3 rounded-full bg-gray-100 text-gray-800 outline-none border-none" id="typeFilter">
+                    <option value="">Property Type</option>
+                    <option value="apartment">Apartment</option>
+                    <option value="house">House</option>
+                    <option value="commercial">Commercial</option>
+                    <option value="land">Land</option>
+                </select>
+                <button onclick="filterProperties()" class="px-8 py-3 gold-gradient text-white rounded-full font-semibold hover:shadow-lg transition-all transform hover:scale-105">
+                    <i class="fas fa-search mr-2"></i>Search
+                </button>
+            </div>
+            
+            <div class="mt-12 flex justify-center space-x-8 text-sm">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-shield-alt text-yellow-400"></i>
+                    <span>Verified Properties</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-headset text-yellow-400"></i>
+                    <span>24/7 Support</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-handshake text-yellow-400"></i>
+                    <span>Trusted Agency</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <i class="fas fa-chevron-down text-2xl text-white"></i>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-12 bg-white shadow-lg relative -mt-6 mx-4 md:mx-20 rounded-2xl z-20">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div class="p-4">
+                    <div class="text-3xl font-bold text-blue-900 mb-2" id="stat1">0</div>
+                    <div class="text-gray-600">Properties Listed</div>
+                </div>
+                <div class="p-4">
+                    <div class="text-3xl font-bold text-blue-900 mb-2" id="stat2">0</div>
+                    <div class="text-gray-600">Happy Clients</div>
+                </div>
+                <div class="p-4">
+                    <div class="text-3xl font-bold text-blue-900 mb-2" id="stat3">0</div>
+                    <div class="text-gray-600">Cities Covered</div>
+                </div>
+                <div class="p-4">
+                    <div class="text-3xl font-bold text-blue-900 mb-2" id="stat4">0</div>
+                    <div class="text-gray-600">Years Experience</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Properties Section -->
+    <section id="properties" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Featured Properties</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Discover our handpicked selection of premium properties available for sale and rent</p>
+            </div>
+            
+            <!-- Filter Buttons -->
+            <div class="flex flex-wrap justify-center gap-4 mb-12">
+                <button class="filter-btn active px-6 py-2 rounded-full border-2 border-blue-900 text-blue-900 font-medium transition-all" onclick="filterByType('all')">All</button>
+                <button class="filter-btn px-6 py-2 rounded-full border-2 border-blue-900 text-blue-900 font-medium transition-all" onclick="filterByType('sale')">For Sale</button>
+                <button class="filter-btn px-6 py-2 rounded-full border-2 border-blue-900 text-blue-900 font-medium transition-all" onclick="filterByType('rent')">For Rent</button>
+                <button class="filter-btn px-6 py-2 rounded-full border-2 border-blue-900 text-blue-900 font-medium transition-all" onclick="filterByType('luxury')">Luxury</button>
+            </div>
+            
+            <!-- Properties Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="propertiesGrid">
+                <!-- Property cards will be dynamically inserted here -->
+            </div>
+            
+            <div class="text-center mt-12">
+                <button onclick="loadMoreProperties()" class="px-8 py-3 border-2 border-blue-900 text-blue-900 rounded-full font-semibold hover:bg-blue-900 hover:text-white transition-all">
+                    Load More Properties
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="about" class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800" alt="Modern Building" class="rounded-2xl shadow-2xl w-full">
+                    <div class="absolute -bottom-6 -right-6 bg-blue-900 text-white p-6 rounded-2xl shadow-xl">
+                        <div class="text-3xl font-bold mb-1">15+</div>
+                        <div class="text-sm">Years of Excellence</div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h2 class="text-4xl font-bold mb-6 text-gray-900">Why Choose 99 Apartments?</h2>
+                    <p class="text-gray-600 mb-8 leading-relaxed">
+                        We are a premier real estate company operating across Nigeria and Cameroon, specializing in luxury apartments, commercial spaces, and residential properties. Our commitment to excellence and client satisfaction sets us apart.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 gold-gradient rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-home text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg mb-1">Premium Listings</h3>
+                                <p class="text-gray-600 text-sm">Access to exclusive properties not available on public markets</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 gold-gradient rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-globe-africa text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg mb-1">Dual Country Presence</h3>
+                                <p class="text-gray-600 text-sm">Operating in both Nigeria and Cameroon with local expertise</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 gold-gradient rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-file-contract text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg mb-1">Legal Support</h3>
+                                <p class="text-gray-600 text-sm">Complete documentation and legal assistance for all transactions</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-blue-900 text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920" class="w-full h-full object-cover">
+        </div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="grid md:grid-cols-2 gap-12">
+                <div>
+                    <h2 class="text-4xl font-bold mb-6">Get In Touch</h2>
+                    <p class="text-gray-300 mb-8 text-lg">
+                        Ready to find your dream property? Contact us today and let our experts guide you through the process.
+                    </p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-center space-x-4 contact-float">
+                            <div class="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-phone-alt text-2xl text-yellow-400"></i>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-400">Nigeria</div>
+                                <a href="tel:+2347040501428" class="text-xl font-semibold hover:text-yellow-400 transition-colors">+234 704 050 1428</a>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4 contact-float" style="animation-delay: 0.5s">
+                            <div class="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-phone-alt text-2xl text-yellow-400"></i>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-400">Cameroon</div>
+                                <a href="tel:+237650656550" class="text-xl font-semibold hover:text-yellow-400 transition-colors">+237 650 656 550</a>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4 contact-float" style="animation-delay: 1s">
+                            <div class="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                <i class="fas fa-envelope text-2xl text-yellow-400"></i>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-400">Email</div>
+                                <a href="mailto:nnaemekamacdonaldibeh@gmail.com" class="text-xl font-semibold hover:text-yellow-400 transition-colors break-all">
+                                    nnaemekamacdonaldibeh@gmail.com
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-blue-900 transition-all">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-blue-900 transition-all">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-blue-900 transition-all">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-blue-900 transition-all">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-8 text-gray-800 shadow-2xl">
+                    <h3 class="text-2xl font-bold mb-6 text-blue-900">Send us a Message</h3>
+                    <form id="contactForm" onsubmit="handleContactSubmit(event)">
+                        <div class="grid md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                                <input type="text" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-900 focus:outline-none transition-all" placeholder="John">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                                <input type="text" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-900 focus:outline-none transition-all" placeholder="Doe">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-900 focus:outline-none transition-all" placeholder="john@example.com">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                            <input type="tel" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-900 focus:outline-none transition-all" placeholder="+234...">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Interest</label>
+                            <select class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-900 focus:outline-none transition-all">
+                                <option>Buying Property</option>
+                                <option>Renting Property</option>
+                                <option>Selling Property</option>
+                                <option>Property Management</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                            <textarea rows="4" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-900 focus:outline-none transition-all" placeholder="Tell us about your requirements..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="w-full py-4 gold-gradient text-white rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-[1.02] flex items-center justify-center">
+                            <span id="submitText">Send Message</span>
+                            <div id="submitLoader" class="loader hidden w-5 h-5 border-2 border-white rounded-full ml-2"></div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-12 border-t border-gray-800">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-8 h-8 gold-gradient rounded flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">99</span>
+                        </div>
+                        <span class="text-xl font-bold text-white serif">Apartments</span>
+                    </div>
+                    <p class="text-sm leading-relaxed mb-4">
+                        Your trusted partner in real estate across Nigeria and Cameroon. Finding perfect spaces for perfect lives.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#home" class="hover:text-yellow-400 transition-colors">Home</a></li>
+                        <li><a href="#properties" class="hover:text-yellow-400 transition-colors">Properties</a></li>
+                        <li><a href="#about" class="hover:text-yellow-400 transition-colors">About Us</a></li>
+                        <li><a href="#contact" class="hover:text-yellow-400 transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Services</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-yellow-400 transition-colors">Property Sales</a></li>
+                        <li><a href="#" class="hover:text-yellow-400 transition-colors">Property Rentals</a></li>
+                        <li><a href="#" class="hover:text-yellow-400 transition-colors">Property Management</a></li>
+                        <li><a href="#" class="hover:text-yellow-400 transition-colors">Real Estate Consulting</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Contact Info</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-phone text-yellow-400 text-xs"></i>
+                            <span>+234 704 050 1428</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-phone text-yellow-400 text-xs"></i>
+                            <span>+237 650 656 550</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <i class="fas fa-envelope text-yellow-400 text-xs mt-1"></i>
+                            <span class="break-all">nnaemekamacdonaldibeh@gmail.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-sm">&copy; 2024 99 Apartments. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0 text-sm">
+                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Property Detail Modal -->
+    <div id="propertyModal" class="modal fixed inset-0 z-50 items-center justify-center p-4 bg-black bg-opacity-50">
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="relative">
+                <img id="modalImage" src="" alt="Property" class="w-full h-64 md:h-96 object-cover">
+                <button onclick="closeModal('propertyModal')" class="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-100 transition-all">
+                    <i class="fas fa-times text-gray-800"></i>
+                </button>
+                <div class="absolute top-4 left-4">
+                    <span id="modalType" class="px-4 py-2 bg-blue-900 text-white rounded-full text-sm font-semibold"></span>
+                </div>
+            </div>
+            
+            <div class="p-6 md:p-8">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h2 id="modalTitle" class="text-3xl font-bold text-gray-900 mb-2"></h2>
+                        <p id="modalLocation" class="text-gray-600 flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2 text-yellow-500"></i>
+                            <span></span>
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <div id="modalPrice" class="text-3xl font-bold text-blue-900"></div>
+                        <div class="text-sm text-gray-500" id="modalPriceType"></div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4 mb-6 py-4 border-y border-gray-200">
+                    <div class="text-center">
+                        <i class="fas fa-bed text-2xl text-blue-900 mb-1"></i>
+                        <div class="font-semibold" id="modalBeds"></div>
+                        <div class="text-xs text-gray-500">Bedrooms</div>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-bath text-2xl text-blue-900 mb-1"></i>
+                        <div class="font-semibold" id="modalBaths"></div>
+                        <div class="text-xs text-gray-500">Bathrooms</div>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-ruler-combined text-2xl text-blue-900 mb-1"></i>
+                        <div class="font-semibold" id="modalArea"></div>
+                        <div class="text-xs text-gray-500">Square Meters</div>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold mb-3">Description</h3>
+                    <p id="modalDescription" class="text-gray-600 leading-relaxed"></p>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold mb-3">Amenities</h3>
+                    <div id="modalAmenities" class="flex flex-wrap gap-2"></div>
+                </div>
+                
+                <div class="flex flex-col md:flex-row gap-4">
+                    <button onclick="contactAboutProperty()" class="flex-1 py-4 bg-blue-900 text-white rounded-lg font-semibold hover:bg-blue-800 transition-all">
+                        <i class="fas fa-phone mr-2"></i>Call Now
+                    </button>
+                    <button onclick="scheduleViewing()" class="flex-1 py-4 border-2 border-blue-900 text-blue-900 rounded-lg font-semibold hover:bg-blue-900 hover:text-white transition-all">
+                        <i class="fas fa-calendar mr-2"></i>Schedule Viewing
+                    </button>
+                    <button onclick="shareProperty()" class="px-6 py-4 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-blue-900 hover:text-blue-900 transition-all">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login/Client Portal Modal -->
+    <div id="loginModal" class="modal fixed inset-0 z-50 items-center justify-center p-4 bg-black bg-opacity-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl relative">
+            <button onclick="closeModal('loginModal')" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-all">
+                <i class="fas fa-times text-gray-600"></i>
+            </button>
+            
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 gold-gradient rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user text-white text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">Client Portal</h2>
+                <p class="text-gray-600 text-sm mt-2">Access your saved properties and documents</p>
+            </div>
+            
+            <form onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <input type="email" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-900 focus:outline-none transition-all" placeholder="your@email.com">
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-900 focus:outline-none transition-all" placeholder="••••••••">
+                </div>
+                
+                <button type="submit" class="w-full py-3 gold-gradient text-white rounded-lg font-semibold hover:shadow-lg transition-all">
+                    Sign In
+                </button>
+                
+                <div class="mt-4 text-center text-sm">
+                    <a href="#" class="text-blue-900 hover:underline">Forgot password?</a>
+                    <span class="mx-2 text-gray-400">|</span>
+                    <a href="#" class="text-blue-900 hover:underline">Create account</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-white rounded-lg shadow-2xl p-4 transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center space-x-3 max-w-sm">
+        <div id="toastIcon" class="w-10 h-10 rounded-full flex items-center justify-center">
+            <i class="fas fa-check text-white"></i>
+        </div>
+        <div>
+            <h4 id="toastTitle" class="font-semibold text-gray-900">Success</h4>
+            <p id="toastMessage" class="text-sm text-gray-600">Operation completed successfully</p>
+        </div>
+    </div>
+
+    <script>
+        // Property Data
+        const properties = [
+            {
+                id: 1,
+                title: "Luxury 3-Bedroom Apartment",
+                location: "Victoria Island, Lagos",
+                price: "₦85,000,000",
+                priceType: "For Sale",
+                type: "sale",
+                beds: 3,
+                baths: 3,
+                area: "240",
+                image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800",
+                description: "Stunning luxury apartment in the heart of Victoria Island featuring modern finishes, spacious living areas, and panoramic ocean views. Includes 24/7 power, security, and access to premium amenities.",
+                amenities: ["Swimming Pool", "Gym", "24/7 Security", "Parking", "Elevator", "Air Conditioning"]
+            },
+            {
+                id: 2,
+                title: "Modern Office Space",
+                location: "Douala, Cameroon",
+                price: "FCFA 450,000",
+                priceType: "Per Month",
+                type: "rent",
+                beds: 0,
+                baths: 2,
+                area: "180",
+                image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800",
+                description: "Premium office space in Douala's business district. Fully furnished with high-speed internet, meeting rooms, and reception services. Perfect for startups and established businesses.",
+                amenities: ["Reception", "Meeting Rooms", "Internet", "Parking", "Security", "Kitchen"]
+            },
+            {
+                id: 3,
+                title: "Waterfront Villa",
+                location: "Lekki, Lagos",
+                price: "₦150,000,000",
+                priceType: "For Sale",
+                type: "luxury",
+                beds: 5,
+                baths: 6,
+                area: "650",
+                image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800",
+                description: "Exclusive waterfront villa with private beach access. Features include infinity pool, smart home system, cinema room, and staff quarters. The epitome of luxury living.",
+                amenities: ["Private Beach", "Infinity Pool", "Smart Home", "Cinema", "Staff Quarters", "Garden"]
+            },
+            {
+                id: 4,
+                title: "Cozy 2-Bedroom Flat",
+                location: "Yaoundé, Cameroon",
+                price: "FCFA 280,000",
+                priceType: "Per Month",
+                type: "rent",
+                beds: 2,
+                baths: 2,
+                area: "120",
+                image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800",
+                description: "Beautifully maintained 2-bedroom apartment in a quiet neighborhood. Close to schools, markets, and public transport. Perfect for small families or professionals.",
+                amenities: ["Parking", "Security", "Balcony", "Storage", "Furnished", "Generator"]
+            },
+            {
+                id: 5,
+                title: "Penthouse Suite",
+                location: "Ikoyi, Lagos",
+                price: "₦200,000,000",
+                priceType: "For Sale",
+                type: "luxury",
+                beds: 4,
+                baths: 5,
+                area: "520",
+                image: "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=800",
+                description: "Ultra-luxurious penthouse with 360-degree city views. Private elevator, rooftop terrace, wine cellar, and bespoke interior design. The crown jewel of Ikoyi.",
+                amenities: ["Private Elevator", "Rooftop Terrace", "Wine Cellar", "Jacuzzi", "Concierge", "Helipad Access"]
+            },
+            {
+                id: 6,
+                title: "Commercial Plaza",
+                location: "Abuja, Nigeria",
+                price: "₦350,000,000",
+                priceType: "For Sale",
+                type: "sale",
+                beds: 0,
+                baths: 10,
+                area: "1200",
+                image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800",
+                description: "Prime commercial property in Abuja's central business district. Multiple floors suitable for retail, offices, or mixed use. High foot traffic area with excellent ROI potential.",
+                amenities: ["Multiple Units", "Parking Lot", "Elevator", "Generator", "Security", "Fire Safety"]
+            }
+        ];
+
+        let currentFilter = 'all';
+        let displayedProperties = 6;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProperties();
+            animateStats();
+            
+            // Navbar scroll effect
+            window.addEventListener('scroll', () => {
+                const navbar = document.getElementById('navbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('shadow-md');
+                } else {
+                    navbar.classList.remove('shadow-md');
+                }
+            });
+        });
+
+        // Render Properties
+        function renderProperties() {
+            const grid = document.getElementById('propertiesGrid');
+            const filtered = currentFilter === 'all' 
+                ? properties 
+                : properties.filter(p => p.type === currentFilter || (currentFilter === 'luxury' && p.type === 'luxury'));
+            
+            grid.innerHTML = filtered.slice(0, displayedProperties).map(property => `
+                <div class="property-card bg-white rounded-2xl overflow-hidden shadow-lg cursor-pointer" onclick="openPropertyModal(${property.id})">
+                    <div class="relative overflow-hidden h-64">
+                        <img src="${property.image}" alt="${property.title}" class="property-image w-full h-full object-cover">
+                        <div class="absolute top-4 left-4">
+                            <span class="px-3 py-1 bg-blue-900 text-white text-xs font-semibold rounded-full">${property.priceType}</span>
+                        </div>
+                        <div class="absolute bottom-4 right-4">
+                            <span class="px-3 py-1 bg-white text-blue-900 text-sm font-bold rounded-full">${property.price}</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-1">${property.title}</h3>
+                        <p class="text-gray-600 text-sm mb-4 flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2 text-yellow-500"></i>
+                            ${property.location}
+                        </p>
+                        <div class="flex justify-between items-center text-sm text-gray-500 border-t pt-4">
+                            ${property.beds > 0 ? `
+                                <div class="flex items-center">
+                                    <i class="fas fa-bed mr-1"></i>
+                                    <span>${property.beds} Beds</span>
+                                </div>
+                            ` : '<div></div>'}
+                            ${property.baths > 0 ? `
+                                <div class="flex items-center">
+                                    <i class="fas fa-bath mr-1"></i>
+                                    <span>${property.baths} Baths</span>
+                                </div>
+                            ` : ''}
+                            <div class="flex items-center">
+                                <i class="fas fa-ruler-combined mr-1"></i>
+                                <span>${property.area}m²</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter Functions
+        function filterByType(type) {
+            currentFilter = type;
+            displayedProperties = 6;
+            
+            // Update button states
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderProperties();
+        }
+
+        function filterProperties() {
+            const location = document.getElementById('locationFilter').value;
+            const type = document.getElementById('typeFilter').value;
+            
+            showToast('Search Results', `Showing properties in ${location || 'all locations'} for ${type || 'all types'}`);
+            
+            // Scroll to properties
+            document.getElementById('properties').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function loadMoreProperties() {
+            displayedProperties += 3;
+            renderProperties();
+            
+            if (displayedProperties >= properties.length) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function openPropertyModal(id) {
+            const property = properties.find(p => p.id === id);
+            if (!property) return;
+            
+            document.getElementById('modalImage').src = property.image;
+            document.getElementById('modalType').textContent = property.priceType;
+            document.getElementById('modalTitle').textContent = property.title;
+            document.getElementById('modalLocation').querySelector('span').textContent = property.location;
+            document.getElementById('modalPrice').textContent = property.price;
+            document.getElementById('modalPriceType').textContent = property.priceType;
+            document.getElementById('modalBeds').textContent = property.beds;
+            document.getElementById('modalBaths').textContent = property.baths;
+            document.getElementById('modalArea').textContent = property.area;
+            document.getElementById('modalDescription').textContent = property.description;
+            
+            const amenitiesHtml = property.amenities.map(amenity => 
+                `<span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">${amenity}</span>`
+            ).join('');
+            document.getElementById('modalAmenities').innerHTML = amenitiesHtml;
+            
+            openModal('propertyModal');
+        }
+
+        // Contact Functions
+        function handleContactSubmit(e) {
+            e.preventDefault();
+            
+            const submitText = document.getElementById('submitText');
+            const submitLoader = document.getElementById('submitLoader');
+            
+            submitText.textContent = 'Sending...';
+            submitLoader.classList.remove('hidden');
+            
+            setTimeout(() => {
+                submitText.textContent = 'Send Message';
+                submitLoader.classList.add('hidden');
+                document.getElementById('contactForm').reset();
+                showToast('Message Sent', 'We will get back to you within 24 hours!');
+            }, 2000);
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            closeModal('loginModal');
+            showToast('Welcome Back', 'Successfully logged into client portal');
+        }
+
+        function contactAboutProperty() {
+            closeModal('propertyModal');
+            document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+            showToast('Contact Us', 'Fill the form to inquire about this property');
+        }
+
+        function scheduleViewing() {
+            showToast('Viewing Scheduled', 'Our agent will contact you to confirm the appointment');
+            closeModal('propertyModal');
+        }
+
+        function shareProperty() {
+            if (navigator.share) {
+                navigator.share({
+                    title: '99 Apartments - Property Listing',
+                    text: 'Check out this amazing property!',
+                    url: window.location.href
+                });
+            } else {
+                showToast('Link Copied', 'Property link copied to clipboard');
+            }
+        }
+
+        // Utility Functions
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function showToast(title, message) {
+            const toast = document.getElementById('toast');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+            
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function animateStats() {
+            const stats = [
+                { id: 'stat1', target: 250, suffix: '+' },
+                { id: 'stat2', target: 1200, suffix: '+' },
+                { id: 'stat3', target: 8, suffix: '' },
+                { id: 'stat4', target: 15, suffix: '+' }
+            ];
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        stats.forEach(stat => {
+                            animateValue(stat.id, 0, stat.target, 2000, stat.suffix);
+                        });
+                        observer.disconnect();
+                    }
+                });
+            });
+            
+            observer.observe(document.getElementById('stat1'));
+        }
+
+        function animateValue(id, start, end, duration, suffix) {
+            const obj = document.getElementById(id);
+            const range = end - start;
+            const minTimer = 50;
+            let stepTime = Math.abs(Math.floor(duration / range));
+            stepTime = Math.max(stepTime, minTimer);
+            
+            let startTime = new Date().getTime();
+            let endTime = startTime + duration;
+            let timer;
+            
+            function run() {
+                let now = new Date().getTime();
+                let remaining = Math.max((endTime - now) / duration, 0);
+                let value = Math.round(end - (remaining * range));
+                obj.innerHTML = value + suffix;
+                if (value == end) {
+                    clearInterval(timer);
+                }
+            }
+            
+            timer = setInterval(run, stepTime);
+            run();
+        }
+
+        // Close modals on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        }
+    </script>
+</body>
+</html>
